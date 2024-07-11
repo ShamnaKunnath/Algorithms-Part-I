@@ -1,3 +1,5 @@
+package Module2;
+
 import edu.princeton.cs.algs4.StdOut;
 import edu.princeton.cs.algs4.StdRandom;
 import edu.princeton.cs.algs4.StdStats;
@@ -14,7 +16,7 @@ public class PercolationStats {
         plot = new double[trials];
         t = trials;
         for (int i = 0; i < trials; i++) {
-            Percolation system = new Percolation(n);
+            Module2.Percolation system = new Module2.Percolation(n);
             while (!system.percolates()) {
                 int x = StdRandom.uniformInt(1, n + 1);
                 int y = StdRandom.uniformInt(1, n + 1);
