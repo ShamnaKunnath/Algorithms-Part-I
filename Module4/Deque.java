@@ -14,6 +14,7 @@ public class Deque<Item> implements Iterable<Item> {
             this.next = null;
             this.prev = null;
         }
+
     }
 
     private Node first;
