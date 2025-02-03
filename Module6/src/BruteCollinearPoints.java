@@ -1,7 +1,8 @@
 import edu.princeton.cs.algs4.In;
-import edu.princeton.cs.algs4.MergeX;
 import edu.princeton.cs.algs4.StdDraw;
 import edu.princeton.cs.algs4.StdOut;
+
+import java.util.Arrays;
 
 public class BruteCollinearPoints {
     private LineSegment[] lineSegments;
@@ -14,58 +15,47 @@ public class BruteCollinearPoints {
      *         or <tt>points</tt> contains repeated points.
      */
     public BruteCollinearPoints(Point[] points) {
-        if(points == null) {
+        if (points == null) {
             throw new IllegalArgumentException("argument to BruteCollinearPoints constructor is null");
         }
 
-        for(Point p : points) {
-            if(p == null) {
+        for (Point p : points) {
+            if (p == null) {
                 throw new IllegalArgumentException("one of the point is null");
             }
         }
-        MergeX.sort(points);
+
         int n = points.length;
-        for(int i = 1;i < n; i++) {
-            if(points[i] == points[i-1]) {
+        Point[] tempPoint = new Point[n];
+        System.arraycopy(points, 0, tempPoint, 0, n);
+        Arrays.sort(tempPoint);
+
+        for (int i = 1; i < n; i++) {
+            if (tempPoint[i].slopeTo(tempPoint[i-1]) == Double.NEGATIVE_INFINITY) {
                 throw new IllegalArgumentException("Argument to constructor contains repeated points");
             }
         }
 
 
-        LineSegment[] tmp = new LineSegment[n];
-        findLineSegments(points, tmp, n);
-//        for(int p = 0; p < n; p++){
-//            for(int q = p+1; q < n; q++){
-//                for(int r = q+1; r < n; r++){
-//                    for(int s = r+1; s < n; s++){
-//                        double slp1 = points[p].slopeTo(points[q]);
-//                        double slp2 = points[p].slopeTo(points[r]);
-//                        double slp3 = points[p].slopeTo(points[s]);
-//                        if(slp1 == slp2 && slp2 == slp3) // p,q,r,s are collinear
-//                        {
-//                            LineSegment line = new LineSegment(points[p], points[s]);
-//                            tmp[noOfLines++] = line;
-//                        }
-//                    }
-//                }
-//            }
-//        }
+        LineSegment[] tmp = new LineSegment[n * 4];
+        findLineSegments(tempPoint, tmp, n);
+
         lineSegments = new LineSegment[noOfLines];
         System.arraycopy(tmp, 0, lineSegments, 0, noOfLines);
     }
 
-    private void findLineSegments(Point[] points, LineSegment[] lineSegments, int n) {
-        for(int p = 0; p < n; p++){
-            for(int q = p+1; q < n; q++){
-                for(int r = q+1; r < n; r++){
-                    for(int s = r+1; s < n; s++){
+    private void findLineSegments(Point[] points, LineSegment[] tmp, int n) {
+        for (int p = 0; p < n; p++) {
+            for (int q = p+1; q < n; q++) {
+                for (int r = q+1; r < n; r++) {
+                    for (int s = r+1; s < n; s++) {
                         double slp1 = points[p].slopeTo(points[q]);
                         double slp2 = points[p].slopeTo(points[r]);
                         double slp3 = points[p].slopeTo(points[s]);
-                        if(slp1 == slp2 && slp2 == slp3) // p,q,r,s are collinear
+                        if (slp1 == slp2 && slp2 == slp3) // p,q,r,s are collinear
                         {
                             LineSegment line = new LineSegment(points[p], points[s]);
-                            lineSegments[noOfLines++] = line;
+                            tmp[noOfLines++] = line;
                         }
                     }
                 }
@@ -86,7 +76,9 @@ public class BruteCollinearPoints {
      * @return The list of line segments
      */
     public LineSegment[] segments() {
-        return lineSegments;
+        LineSegment[] resulCopy = new LineSegment[noOfLines];
+        System.arraycopy(lineSegments, 0, resulCopy, 0, noOfLines);
+        return resulCopy;
     }
 
     public static void main(String[] args) {

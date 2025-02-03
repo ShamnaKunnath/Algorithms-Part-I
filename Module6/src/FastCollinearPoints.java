@@ -13,31 +13,35 @@ public class FastCollinearPoints {
      * @param points
      */
     public FastCollinearPoints(Point[] points) {
-        if(points == null) {
+        if (points == null) {
             throw new IllegalArgumentException("argument to BruteCollinearPoints constructor is null");
         }
 
-        for(Point p : points) {
-            if(p == null) {
+        for (Point p : points) {
+            if (p == null) {
                 throw new IllegalArgumentException("one of the point is null");
             }
         }
-        Arrays.sort(points);
+
         int n = points.length;
-        for(int i = 1;i < n; i++) {
-            if(points[i] == points[i-1]) {
+        Point[] tempPoint = new Point[n];
+        System.arraycopy(points, 0, tempPoint, 0, n);
+        Arrays.sort(tempPoint);
+
+        for (int i = 1; i < n; i++) {
+            if (tempPoint[i].slopeTo(tempPoint[i-1]) == Double.NEGATIVE_INFINITY) {
                 throw new IllegalArgumentException("Argument to constructor contains repeated points");
             }
         }
-        LineSegment[] tmp = new LineSegment[n];
-        findLineSegments(points, tmp, n);
+        LineSegment[] tmp = new LineSegment[n * 4];
+        findLineSegments(tempPoint, tmp, n);
 
         lineSegments = new LineSegment[noOfLines];
         System.arraycopy(tmp, 0, lineSegments, 0, noOfLines);
     }
 
-    private void findLineSegments(Point[] points, LineSegment[] lineSegments, int n) {
-        for(int i = 0; i < n; i++) {
+    private void findLineSegments(Point[] points, LineSegment[] tmp, int n) {
+        for (int i = 0; i < n; i++) {
             Point p = points[i];
 
             int copySize = n - i - 1;
@@ -46,21 +50,21 @@ public class FastCollinearPoints {
             Arrays.sort(tempPoint, p.slopeOrder());
 
             int c = 2;
-            for(int j = 1; j < copySize; j++) {
-                if(p.slopeTo(tempPoint[j-1]) == p.slopeTo(tempPoint[j])) {
+            for (int j = 1; j < copySize; j++) {
+                if (Double.compare(p.slopeTo(tempPoint[j-1]), p.slopeTo(tempPoint[j])) == 0) {
                     c++;
                 } else {
-                    if(c >= 4) {
+                    if (c >= 4) {
                         LineSegment lineSegment = new LineSegment(p, tempPoint[j-1]);
-                        lineSegments[noOfLines++] = lineSegment;
+                        tmp[noOfLines++] = lineSegment;
                     }
                     c = 2;
 
                 }
             }
-            if(c >= 4) {
+            if (c >= 4) {
                 LineSegment lineSegment = new LineSegment(p, tempPoint[copySize-1]);
-                lineSegments[noOfLines++] = lineSegment;
+                tmp[noOfLines++] = lineSegment;
             }
         }
     }
@@ -78,7 +82,9 @@ public class FastCollinearPoints {
      * @return
      */
     public LineSegment[] segments() {
-        return lineSegments;
+        LineSegment[] resulCopy = new LineSegment[noOfLines];
+        System.arraycopy(lineSegments, 0, resulCopy, 0, noOfLines);
+        return resulCopy;
     }
 
     public static void main(String[] args) {
